@@ -1,9 +1,9 @@
 import uvicorn
 from fastapi import FastAPI
-from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.settings import load_settings
 from src.api_v1.routers import api_router
-from src.db.session import get_db_session
+from src.db.session import db_session_provider, stub
 
 
 def main() -> FastAPI:
@@ -11,7 +11,8 @@ def main() -> FastAPI:
 
     fastapi.include_router(api_router)
 
-    fastapi.dependency_overrides[AsyncSession] = get_db_session
+    config = load_settings()
+    fastapi.dependency_overrides[stub] = db_session_provider(config)
 
     return fastapi
 

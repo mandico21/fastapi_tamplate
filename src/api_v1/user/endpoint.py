@@ -1,10 +1,11 @@
 from sqlite3 import IntegrityError
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.api_v1.user.repo import UserRepo
 
+from src.api_v1.user.repo import UserRepo
 from src.api_v1.user.schema import UserCreate, UserView
-from src.db.session import get_db_session
+from src.db.session import stub
 
 user_router = APIRouter()
 
@@ -15,7 +16,7 @@ user_router = APIRouter()
                   summary='Добавить нового пользователя')
 async def create_user(
         user_in: UserCreate,
-        db_session: AsyncSession = Depends(get_db_session),
+        db_session: AsyncSession = Depends(stub),
         user_repo: UserRepo = Depends()
 ) -> UserView:
     try:
@@ -23,6 +24,6 @@ async def create_user(
     except IntegrityError:
         raise HTTPException(
             status_code=404,
-            detail="Пользователь с данным Telegram ID уже внесен в базу данных",
+            detail="Пользователь с данным ID уже внесен в базу данных",
         )
     return user
